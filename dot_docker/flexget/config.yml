@@ -1,0 +1,258 @@
+#web_server: yes
+#
+# FITXER DE VARIABLES
+#
+variables: variables.yml
+#
+# TEMPLATES
+#
+templates:
+#
+# CONFIGURACIO DEL TRANSMISSION
+#
+  transmission-anchors:
+    _transmissionSettings: &transmissionSettings
+      host: "{? transmission.host ?}"
+      port: 6061
+      username: "{? transmission.user ?}"
+      password: "{? transmission.pass ?}"
+#
+# CONFIGURACIO DESCARREGA DE PODCAST
+#
+
+  podcast:
+    accept_all: yes
+    limit_new: 5
+    set:
+      filename: "{{ rss_pubdate | formatdate('%Y-%m-%d') }} -  {{ original_title }}.mp3"
+
+#
+# CONFIGURACIO PER A LA MUSICA ARMIN VAN BUUREN | HARDWELL | MARKUS SCHULZ | PAUL VAN DYK | TIESTO
+#
+  buurenReject:
+    accept_all: yes
+    regexp:
+      reject_excluding:
+#        - '(256|320) kbps'
+        - '(A State Of Trance|A_State_Of_Trance|A_State_of_Trance)'
+        - '(Armin van Buuren|Armin Van Buuren|Armin-van-Buuren|Armin_van_Buuren)'
+#        - '256 kbps'
+        - 'TALiON'
+      from: title
+
+  markusReject:
+    accept_all: yes
+    regexp:
+      reject_excluding:
+        - '(Markus Schulz|Markus_Schulz)'
+        - '(Global_Dj_Broadcast|GLOBAL_DJ_BROADCATS)'
+        - 'TALiON'
+      from: title
+
+  tiestoReject:
+    accept_all: yes
+    regexp:
+      reject_excluding:
+        - '(Dj_Tiesto|DJ_TIESTO|Tiesto)'
+        - '(Club_Life|CLUB_LIFE)'
+        - 'TALiON'
+      from: title
+
+  DykReject:
+    accept_all: yes
+    regexp:
+      reject_excluding:
+        - '(Pau_Van_Dyk|Paul_van_Dyk)'
+        - '(VONYC_SESSIONS|VONYC_Sessions)'
+        - 'TALiON'
+      from: title
+
+#
+# CONFIGURACIO FET SERVIR A LHORA DESBORRAR LA INFORMACIO
+#
+  disable-seen-hash:
+    disable:
+      - seen
+      - seen_info_hash
+
+tasks:
+#
+# TOTA LA FUNCIONALITAT PER A LA DESCARREGA DE FITXERS ( PELICULAS - LLIBRES )
+#
+# DESCARREGA EBOOKS
+#  downloadEbookRss:
+#    priority: 1
+#    rss: http://rss.epublibre.org/rss/semanal
+#    rss: rss_semanal.rss
+#    accept_all: yes
+#    transmission:
+#      <<: *transmissionSettings
+
+#
+# DESCARREGA MUSICA
+#
+
+# Armin Van Buuren - State Of Trance
+  downloadRssBuuren:
+    priority: 2
+    transmission:
+      <<: *transmissionSettings
+    template: buurenReject
+    rss:
+      url: https://torrentseeds.org/rss.php?cats=4&type=dl&torrent_pass=0000652f882741c7b79b007755938d2a
+      username: "{? torrentSeeds.user ?}"
+      password: "{? torrentSeeds.pass ?}"
+    cfscraper: yes
+
+# Markus Schulz - GDJB
+  downloadRssMarkus:
+    priority: 4
+    transmission:
+      <<: *transmissionSettings
+    template: markusReject
+    rss:
+      url: https://torrentseeds.org/rss.php?cats=4&type=dl&torrent_pass=0000652f882741c7b79b007755938d2a
+      username: "{? torrentSeeds.user ?}"
+      password: "{? torrentSeeds.pass ?}"
+    cfscraper: yes
+
+# Dj Tiesto - Club Life
+  downloadRssTiesto:
+    priority: 5
+    transmission:
+      <<: *transmissionSettings
+    template: tiestoReject
+    rss:
+      url: https://torrentseeds.org/rss.php?cats=4&type=dl&torrent_pass=0000652f882741c7b79b007755938d2a
+      username: "{? torrentSeeds.user ?}"
+      password: "{? torrentSeeds.pass ?}"
+    cfscraper: yes
+
+# Paul Van Dyck  Vonyc Sessions
+  downloadRssDyk:
+    priority: 6
+    transmission:
+      <<: *transmissionSettings
+    template: DykReject
+    rss:
+      url: https://torrentseeds.org/rss.php?cats=4&type=dl&torrent_pass=0000652f882741c7b79b007755938d2a
+      username: "{? torrentSeeds.user ?}"
+      password: "{? torrentSeeds.pass ?}"
+    cfscraper: yes
+
+
+#
+# DESCARREGA DE PODCAST
+#
+
+# Podcast En Guardia
+  podCastEnGuardia:
+    template: podcast
+    rss: https://dinamics.ccma.cat/public/podcast/catradio/xml/4/4/podprograma944.xml
+    download: /media/podcast
+
+
+#
+# FUNCIONALITAT DE MOVIMENT / TRANSFORMACIO DELS DIFERENTS TIPUS DE FITXERS
+#
+# COPIA ELS LLIBRES DESCARREGATS A DIRECTORI DE SEGURETAT
+  moveBook:
+    priority: 7
+    filesystem:
+      path: "/{? folder.transmission ?}"
+      mask: '*.epub'
+    accept_all: yes
+    copy:
+      to: "/{? folder.storage ?}"
+
+# ES TRANSFORMA EL FITXER MP3 AMB LAME AL DIRECTORI DE SEGURETAT
+  moveMusic:
+    priority: 8
+    filesystem:
+      path: "/{? folder.transmission ?}"
+      recursive: yes
+      retrieve:
+        - files
+        - dirs
+      regexp: '.*\.(mp3|cue)$'
+    accept_all: yes
+    exec:
+      auto_escape: yes
+      on_output:
+        for_entries:
+          - "if:"
+          - "not '{{ location | re_replace( 'media/transmission', 'backup' ) | pathdir }}' is fs_dir:"
+          - "  mkdir '{{ location | re_replace( 'media/transmission', 'media/backup' ) | pathdir }}'"
+          - "cp '{{ location }}' '{{ location | re_replace( 'media/transmission', 'media/backup') }}'"
+
+#
+# ES MOU I ES RENOMBRA LES PELICULES DESCARREGADES AMULE
+#
+  sortMovies:
+    priority: 9
+    no_entries_ok: yes
+    filesystem:
+      path: "/{? folder.amule ?}"
+      regexp: '.*\.(avi|mkv|mp4)$'
+      recursive: yes
+    accept_all: yes
+    tmdb_lookup:
+      language: es
+    require_field: tmdb_name
+    exec:
+      auto_escape: yes
+      on_output:
+        for_entries: |
+          cp "{{ location }}" "/media/movies/{{ tmdb_name }} ({{ tmdb_year }}){{ location | pathext }}"
+#
+# ESBORRAR TORRENTS QUE JA HAN COMPARTIT EL MAXIM PERMES
+#
+  cleanTransmission:
+    priority: 10
+    template:
+      - disable-seen-hash
+    from_transmission:
+      <<: *transmissionSettings
+    if:
+      - transmission_progress == 100: accept
+      - not transmission_seed_ratio_ok: reject
+      - not transmission_idle_limit_ok: reject
+    transmission:
+      <<: *transmissionSettings
+      action: purge
+#
+# DIMONI PER A LA EXECUCIO DE LES TASQUES
+#
+schedules:
+
+# DESCARREGA LLIBRES EPUB
+#  - tasks: 'downloadEbookRss'
+#    interval:
+#      days: 1
+      
+# DESCARREGA MUSICA ( ARMIN, HARDWELL, MARKUS, TIESTO, DYK )
+  - tasks: ['downloadRss*']
+    interval:
+      minutes: 30
+
+# DESCARREGA PODCAST
+  - tasks: ['podCast*']
+    interval:
+      days: 1
+
+# NETEJA DE FITXERS QUE SUPEREN EL NIVELL DE COMPARTICIO
+  - tasks: ['clean*']
+    schedule:
+      hour: 9-21/2
+      minute: "*/30"
+
+# MOVIMENT DE FITXERS
+  - tasks: ['move*']
+    schedule:
+      hour: 8-20
+      minute: "*/30"
+
+# ORDENACIO PELICULES / SERIES
+  - tasks: ['sort*']
+    schedule:
+      hour: 5,11,15,17,23
