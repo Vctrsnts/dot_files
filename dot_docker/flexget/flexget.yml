@@ -1,0 +1,34 @@
+version: "3.6"
+
+services:
+#
+# DESPRES DE REALITZAR LA INSTALACIÓ S'HA D'INSTALAR EL PAQUET EYED3
+# TINC POSSAT ALTRES VOLUMNS PER AIXI PODER DESCARREGAR O MOURE LES SEGÜENTS COSES:
+#  - LLIBRES
+#  - SERIES
+#  - PELICULES
+#  - PODCAST
+#  - MUSICA
+# I ESTAT 'LINKAD' AMB TRANSMISSION
+#
+  flexget:
+    image: wiserain/flexget:latest
+    container_name: flexget
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TORRENT_PLUGIN=transmission
+      - FG_WEBUI_PASSWD=${PASSWORD}
+      - TZ=Europe/Madrid
+    volumes:
+      - ${STORAGE}/transmission/complete:/media/transmission # PER ELS LLIBRES ( EPUB )
+      - ${STORAGE}/amule/incoming:/media/amule # PELICULES
+      - ${STORAGE}/transmission/medusa:/media/medusa # PER LES SERIES
+      - ${STORAGE}/config/flexget:/config # CONFIGURACIO
+      - ${STORAGE}/backup:/media/backup # MUSIC
+      - ${MEDIA}/series:/media/series # SERIES 
+      - ${MEDIA}/movies:/media/movies # PELICULAS
+      - ${MEDIA}/music/Podcasts:/media/podcasts #PODCASTS
+    links:
+      - transmission

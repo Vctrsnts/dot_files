@@ -1,0 +1,22 @@
+version: "2.1"
+
+services:
+#
+# SAMBA
+#
+  samba:
+    image: dperson/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    command: '-s "Movies;/media/movies;yes;no" -s "Series;/media/series;yes;no" -u "USER;PASSWORD"'
+    ports:
+      - 139:139
+      - 445:445
+    environment:
+      - TZ=Europe/Madrid
+    stdin_open: true
+    tty: true
+    volumes:
+      - /usr/share/zoneinfo/Europe/Madrid:/etc/localtime
+      - ${MEDIA}/movies:/media/movies
+      - ${MEDIA}/series:/media/series

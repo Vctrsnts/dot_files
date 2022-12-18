@@ -1,0 +1,27 @@
+#
+# AMULE - DESCARREGA ELINKS
+# LES PARAULES QUE ESTAN ENTRE CORTXETS '{}' SON VARIABLES
+# DEFINIDES AL FITXER .ENV
+#
+version: "3.6"
+
+services:
+  amule:
+    image: ngosang/amule:latest
+    container_name: amule
+    restart: unless-stopped
+    ports:
+     - 4712:4712
+     - 4711:4711
+     - 4662:4662
+     - 4665:4665/udp
+     - 4672:4672/udp
+    environment:
+     - PUID=1000
+     - PGID=1000
+     - GUI_PWD=${PASSWORD}
+     - TZ=Europe/Madrid
+    volumes:
+     - ${STORAGE}/config/amule:/home/amule/.aMule
+     - ${STORAGE}/amule/incoming:/incoming
+     - ${STORAGE}/amule/tmp:/temp

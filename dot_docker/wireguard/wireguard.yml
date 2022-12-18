@@ -1,0 +1,27 @@
+version: "3.6"
+
+services:
+#
+# WIREGUARD - CONNEXIO VPN
+#
+  wireguard:
+    image: linuxserver/wireguard
+    container_name: wireguard
+    restart: unless-stopped
+    ports:
+      - 51820:51820/udp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - PEERS=1 #optional
+      - PEERDNS=auto #optional
+    volumes:
+      - ${STORAGE}/config/wireguard:/config
+      - /lib/modules:/lib/modules
+      - /usr/src:/usr/src
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE

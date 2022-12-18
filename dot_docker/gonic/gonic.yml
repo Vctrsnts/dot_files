@@ -1,0 +1,18 @@
+version: "3.6"
+
+services:
+#
+# SERVIDOR DE MUSICA PER ESCOLTAR A QUALSEVOL LLOC, ESTIL SPOTIFY
+# PERO FEN SERVIR LA API DE SUBSONIC
+#
+  gonic_web:
+    image: sentriz/gonic:latest
+    container_name: gonic
+    ports:
+      - 4533:80
+    environment:
+      - GONIC_SCAN_INTERVAL=59 
+    volumes:
+      - ${STORAGE}/config/gonic/data:/data
+      - ${STORAGE}/config/gonic/cache:/cache
+      - ${MEDIA}/music:/music

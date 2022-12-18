@@ -1,0 +1,26 @@
+version: "3.6"
+
+services:
+#
+# PIHOLE - BLOQUEJA PUBLICITAT
+#
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "9080:80/tcp"
+      - "67:67/udp"
+    environment:
+      TZ: 'Europe/Madrid'
+      WEBPASSWORD: ${PASSWORD}
+    volumes:
+      - ${STORAGE}/config/pihole:/etc/pihole
+      - ${STORAGE}/config/pihole/dnsmasq.d:/etc/dnsmasq.d
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    cap_add:
+      - NET_ADMIN

@@ -1,0 +1,26 @@
+version: "3.6"
+
+services:
+#
+# NAVIDROME - GESTOR DE MUSICA
+#
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: 1000:1000 
+    ports:
+      - 4533:4533
+    restart: unless-stopped
+    environment:
+      ND_TRANSCODINGCACHESIZE: 100MB
+      ND_SCANSCHEDULE: "@every 1h"
+      ND_SESSIONTIMEOUT: 24h
+      ND_LASTFM_ENABLED: "true"
+      ND_LASTFM_APIKEY: "API DE LAST.FML"
+      ND_LASTFM_SECRET: "SECRET KEY DE LAST.FM"
+      ND_LASTFM_LANGUAGE: "es"
+      ND_SPOTIFY_ID: "IF DE SPOTIFY"
+      ND_SPOTIFY_SECRET: "SECRET KEY DE SPOTIFY"
+    volumes:
+      - ${STORAGE}/config/navidrome:/data
+      - ${MEDIA}/music:/music:ro

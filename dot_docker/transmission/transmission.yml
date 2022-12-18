@@ -1,0 +1,31 @@
+#
+# TRANSMISSION - DESCARREGA ELINKS
+# LES PARAULES QUE ESTAN ENTRE CORTXETS '{}' SON VARIABLES
+# DEFINIDES AL FITXER .ENV
+#
+version: "3.6"
+
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission
+    container_name: transmission
+    restart: unless-stopped
+    ports:
+     - 6061:6061
+     - 51413:51413
+     - 51413:51413/udp
+    environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=Europe/Madrid
+     - USER=${USER}
+     - PASS=${PASSWORD}
+     - TRANSMISSION_WEB_HOME=/transmission-web-control/
+    expose:
+     - 6061
+     - 51413
+    volumes:
+     - ${STORAGE}/transmission/medusa:/downloads/medusa
+     - ${STORAGE}/transmission/complete:/downloads/complete
+     - ${STORAGE}/transmission/incomplete:/downloads/incomplete
+     - ${STORAGE}/config/transmission:/config
