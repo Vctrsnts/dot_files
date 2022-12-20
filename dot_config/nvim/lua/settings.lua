@@ -78,3 +78,8 @@ opt.hidden = true                                     -- enable background buffe
 --opt.history = 100                                   -- remember n lines in history
 opt.lazyredraw = true                                 -- faster scrolling
 opt.synmaxcol = 1000                                  -- max column for syntax highlight
+
+---------------------------------------------------------------------------------------------------
+-- Configuració Text mardown
+---------------------------------------------------------------------------------------------------
+cmd [[autocmd FileType markdown let g:indentLine_enabled=0]]

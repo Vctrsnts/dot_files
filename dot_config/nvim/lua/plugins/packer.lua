@@ -63,6 +63,28 @@ return require('packer').startup(function(use)
   }
 
   -------------------------------------------------------------------------------------------------
+  -- Activem el AutoSave
+  -------------------------------------------------------------------------------------------------
+  use "Pocco81/auto-save.nvim"
+
+  -------------------------------------------------------------------------------------------------
+  -- Activem autocomplete i snipets
+  -------------------------------------------------------------------------------------------------
+  use {
+    'hrsh7th/nvim-cmp',
+    requires = {
+      'L3MON4D3/LuaSnip',
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-buffer',
+      'f3fora/cmp-spell',
+      'saadparwaiz1/cmp_luasnip',
+    },
+  }
+  use 'rafamadriz/friendly-snippets'
+  use {'onsails/lspkind-nvim'}
+
+  -------------------------------------------------------------------------------------------------
   -- Final del fitxer de configuració de plugins
   -------------------------------------------------------------------------------------------------
   if packer_bootstrap then

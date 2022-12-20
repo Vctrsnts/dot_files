@@ -22,6 +22,9 @@ require('keymaps')			                            -- Fitxer de la configuració d
 -- Comença la carrega de plugins
 ----------------------------------------------------------------------------------------------------
 require('plugins/packer')		                        -- Gestor de Plugins
+require('plugins/autosave')                         -- Plugin per a realitzar el AutoSave
 require('plugins/ayu')			                        -- Color Theme
 require('plugins/neo-tree')                         -- filebrowser
 require('plugins/feline')                           -- statusline
+require('plugins/luasnip')                          -- snippets
+require('plugins/nvim-cmp')                         -- autocomplete
