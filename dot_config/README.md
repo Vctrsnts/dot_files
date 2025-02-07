@@ -7,4 +7,5 @@ Aqui tinc la meva configuració de les diferents aplicacions que faig servir :
 - kitty --> Configuració per al terminal
 - nvim --> Configuració de `NeoVim`
 - rofi --> Configuració de l'aplicació de `Rofi`
-- tmux --> Configuració que feia servir per a `tmux` 
+- tmux --> Configuració que feia servir per a `tmux`
+- wezterm --> Configuració que es fa servir pel terminal wezterm. El que estic servir ara mateix
